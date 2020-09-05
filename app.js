@@ -3,7 +3,7 @@ var mysql = require('mysql')
 var bodyParser = require('body-parser')
 var uuid = require('uuid');
 const app = express()
-const port = 3000
+const port = 8080
 
 //bodyparser
 app.use(bodyParser.urlencoded({
@@ -78,6 +78,6 @@ app.post('/add/book',(req,res)=>{
 
 
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
+  console.log(`Example app listening at`)
 })
 
