@@ -25,7 +25,6 @@ var connection = mysql.createConnection({
 // user signup
 app.post('/signup', (req, res) => {
 
-  connection.connect();
 
   if (req.body.userName !== null && req.body.userPass !== null && req.body.userEmail !== null) {
 
@@ -36,8 +35,6 @@ app.post('/signup', (req, res) => {
       }
       res.send(results)
     });
-    connection.end();
-
 
   }
 })
@@ -45,7 +42,6 @@ app.post('/signup', (req, res) => {
 //get user by user email
 app.get('/user', (req, res) => {
   console.log(req.query)
-  connection.connect();
 
   if (req.query.userEmail != null) {
     connection.query(`SELECT * FROM users WHERE user_email="${req.query.userEmail}"`, function (error, results, fields) {
@@ -58,7 +54,6 @@ app.get('/user', (req, res) => {
 
 //get all books
 app.get('/books',(req,res)=>{
-  connection.connect();
 
     connection.query(`SELECT * FROM books`, function (error, results, fields) {
       if (error) throw error
@@ -70,7 +65,6 @@ app.get('/books',(req,res)=>{
 
 //add book
 app.post('/add/book',(req,res)=>{
-  connection.connect();
 
   if (req.body.bookTitle !== null && req.body.bookUrl !== null && req.body.bookAuthor !== null && req.body.bookPrice !== null) {
 
