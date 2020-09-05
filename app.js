@@ -53,6 +53,29 @@ app.get('/user', (req, res) => {
   }
 })
 
+//get all books
+app.get('/books',(req,res)=>{
+
+})
+
+//add book
+app.post('/add/book',(req,res)=>{
+  if (req.body.bookTitle !== null && req.body.bookUrl !== null && req.body.bookAuthor !== null && req.body.bookPrice !== null) {
+
+    const book_id = uuid.v4();
+    connection.query(`INSERT INTO books VALUES("${book_id}","${req.body.bookUrl}","${req.body.bookTitle}",${req.body.bookPrice},"${req.body.bookAuthor}")`, function (error, results, fields) {
+      if (error) {
+        res.status(404).send(error.message)
+      }
+      res.send(results)
+    });
+    connection.end();
+
+
+  }
+})
+
+
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
