@@ -55,6 +55,13 @@ app.get('/user', (req, res) => {
 
 //get all books
 app.get('/books',(req,res)=>{
+ 
+    connection.query(`SELECT * FROM books`, function (error, results, fields) {
+      if (error) throw error
+      res.send(results)
+    });
+    connection.end();
+
 
 })
 
