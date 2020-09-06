@@ -10,17 +10,24 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 app.use(bodyParser.json());
+var connection=null;
 
+
+app.use((req,res,next)=>{
+  connection = mysql.createConnection({
+    host: 'mydb.cmfzm1h1kavq.us-east-1.rds.amazonaws.com',
+    user: 'root',
+    port: 3306,
+    password: '9333deeP',
+    database: 'mydb'
+  });
+  connection.connect()
+  next()
+})
 
 //mysql db connection
 
-var connection = mysql.createConnection({
-  host: 'mydb.cmfzm1h1kavq.us-east-1.rds.amazonaws.com',
-  user: 'root',
-  port: 3306,
-  password: '9333deeP',
-  database: 'mydb'
-});
+
 
 // user signup
 app.post('/signup', (req, res) => {
@@ -35,6 +42,7 @@ app.post('/signup', (req, res) => {
       }
       res.send(results)
     });
+    connection.end()
 
   }
 })
@@ -43,11 +51,13 @@ app.post('/signup', (req, res) => {
 app.get('/user', (req, res) => {
   console.log(req.query)
 
+
   if (req.query.userEmail != null) {
     connection.query(`SELECT * FROM users WHERE user_email="${req.query.userEmail}"`, function (error, results, fields) {
       if (error) throw error
       res.send(results)
     });
+    connection.end();
 
   }
 })
@@ -59,6 +69,7 @@ app.get('/books',(req,res)=>{
       if (error) throw error
       res.send(results)
     });
+    connection.end()
 
 
 })
@@ -66,6 +77,7 @@ app.get('/books',(req,res)=>{
 //add book
 app.post('/add/book',(req,res)=>{
 
+  
   if (req.body.bookTitle !== null && req.body.bookUrl !== null && req.body.bookAuthor !== null && req.body.bookPrice !== null) {
 
     const book_id = uuid.v4();
@@ -75,6 +87,7 @@ app.post('/add/book',(req,res)=>{
       }
       res.send(results)
     });
+    connection.end()
 
 
   }
