@@ -85,6 +85,23 @@ app.post('/add/book',(req,res)=>{
       if (error) {
         res.status(404).send(error.message)
       }
+      console.log(results);
+      res.send(results)
+    });
+    connection.end()
+
+
+  }
+})
+
+app.get('/get/books',(req,res)=>{
+  console.log(req.query.book_ids);
+
+  if (req.query.book_ids!=null) {
+    console.log(`SELECT * FROM books WHERE book_id IN ('${req.query.book_ids.join("','")}')`)
+    connection.query(`SELECT * FROM books WHERE book_id IN ('${req.query.book_ids.join("','")}')`, function (error, results, fields) {
+      if (error) throw error
+      console.log(results)
       res.send(results)
     });
     connection.end()
