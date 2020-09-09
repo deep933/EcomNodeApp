@@ -2,6 +2,7 @@ const express = require('express')
 var mysql = require('mysql')
 var bodyParser = require('body-parser')
 var uuid = require('uuid');
+const { query } = require('express');
 const app = express()
 const port = 8081
 
@@ -11,7 +12,6 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(bodyParser.json());
 var connection=null;
-
 
 app.use((req,res,next)=>{
   connection = mysql.createConnection({
@@ -27,22 +27,47 @@ app.use((req,res,next)=>{
 
 //mysql db connection
 
-
-
 // user signup
 app.post('/signup', (req, res) => {
 
 
-  if (req.body.userName !== null && req.body.userPass !== null && req.body.userEmail !== null) {
+  if (req.body.user_name !== null && req.body.user_pass !== null && req.body.user_email !== null) {
 
     const user_id = uuid.v1();
-    connection.query(`INSERT INTO users VALUES("${req.body.userName}","${req.body.userEmail}","${req.body.userPass}","${user_id}")`, function (error, results, fields) {
-      if (error) {
-        res.status(404).send(error.message)
-      }
-      res.send(results)
+    connection.query(`INSERT INTO users VALUES("${req.body.user_name}","${req.body.user_email}","${req.body.user_pass}","${user_id}")`, function (error, results, fields) {
+      if (error) throw error
+
+      connection.query(`SELECT * FROM users WHERE user_id="${user_id}"`, function (error, results, fields) {
+        if (error) throw error
+
+        res.send(results[0])
+        connection.end()
+      });
     });
-    connection.end()
+
+  }
+})
+
+
+app.post('/login', (req, res) => {
+
+
+  if (req.body.user_pass !== null && req.body.user_email !== null) {
+
+    const user_id = uuid.v1();
+
+
+      connection.query(`SELECT * FROM users WHERE user_email="${req.body.user_email}" AND user_pass="${req.body.user_pass}"`, function (error, results, fields) {
+        if (error) throw error
+if(results[0]!=null){
+  res.send(results[0])
+}
+else{
+  res.send({})
+}
+        connection.end()
+      });
+  
 
   }
 })
@@ -51,9 +76,8 @@ app.post('/signup', (req, res) => {
 app.get('/user', (req, res) => {
   console.log(req.query)
 
-
   if (req.query.userEmail != null) {
-    connection.query(`SELECT * FROM users WHERE user_email="${req.query.userEmail}"`, function (error, results, fields) {
+    connection.query(`SELECT * FROM users WHERE user_email="${req.query.userEmail}" LIMIT 1`, function (error, results, fields) {
       if (error) throw error
       res.send(results)
     });
@@ -77,7 +101,6 @@ app.get('/books',(req,res)=>{
 //add book
 app.post('/add/book',(req,res)=>{
 
-  
   if (req.body.bookTitle !== null && req.body.bookUrl !== null && req.body.bookAuthor !== null && req.body.bookPrice !== null) {
 
     const book_id = uuid.v4();
@@ -98,8 +121,15 @@ app.get('/get/books',(req,res)=>{
   console.log(req.query.book_ids);
 
   if (req.query.book_ids!=null) {
-    console.log(`SELECT * FROM books WHERE book_id IN ('${req.query.book_ids.join("','")}')`)
-    connection.query(`SELECT * FROM books WHERE book_id IN ('${req.query.book_ids.join("','")}')`, function (error, results, fields) {
+    var query = null
+if(Array.isArray(req.query.book_ids)){
+    query = req.query.book_ids.join("','")
+}
+else{
+   query = req.query.book_ids
+}
+    console.log(`SELECT * FROM books WHERE book_id IN ('${query}')`)
+    connection.query(`SELECT * FROM books WHERE book_id IN ('${query}')`, function (error, results, fields) {
       if (error) throw error
       console.log(results)
       res.send(results)
